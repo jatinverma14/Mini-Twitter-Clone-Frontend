@@ -57,12 +57,12 @@ const EditProfile = ({ setOpen }) => {
               profilePicture: downloadURL,
             });
 
-            console.log(updateProfile);
+            // console.log(updateProfile);
           } catch (error) {
             console.log(error);
           }
 
-          console.log("downloaded " + downloadURL);
+          // console.log("downloaded " + downloadURL);
           dispatch(changeProfile(downloadURL));
         });
       }

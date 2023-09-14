@@ -12,8 +12,7 @@ const TimelineTweet = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const timelineTweets = await axios.get(
-          `/tweets/timeline/${currentUser._id}`
+        const timelineTweets = await axios.get(`/tweets/timeline/${currentUser._id}`
         );
 
         setTimeLine(timelineTweets.data);
@@ -25,7 +24,7 @@ const TimelineTweet = () => {
     fetchData();
   }, [currentUser._id]);
 
-  console.log("Timeline", timeLine);
+  // console.log("Timeline", timeLine);
   return (
     <div className="mt-6">
       {timeLine &&

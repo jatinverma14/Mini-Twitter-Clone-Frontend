@@ -25,7 +25,7 @@ const MainTweet = () => {
   return (
     <div>
       {currentUser && (
-        <p className="font-bold pl-2 my-2">{currentUser.username}</p>
+        <p className="font-bold pl-2 my-2" style={{textTransform: "capitalize"}}>{currentUser.username}</p>
       )}
 
       <form className="border-b-2 pb-6">

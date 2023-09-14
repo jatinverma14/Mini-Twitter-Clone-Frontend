@@ -22,6 +22,7 @@ const Signin = () => {
       dispatch(loginSuccess(res.data));
       navigate("/");
     } catch (err) {
+      alert("Wrong credentials or User doesn't exist");
       dispatch(loginFailed());
     }
   };
@@ -39,6 +40,7 @@ const Signin = () => {
       dispatch(loginSuccess(res.data));
       navigate("/");
     } catch (err) {
+      alert("User already exist exist");
       dispatch(loginFailed());
     }
   };

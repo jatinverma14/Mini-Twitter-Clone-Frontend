@@ -22,7 +22,7 @@ const Navbar = () => {
 
       <div className="col-span-2 md:border-x-2 md:border-slate-200 md:px-6 my-6 md:my-0">
         <div className="flex justify-between items-center">
-          <h2 className="font-bold text-2xl">
+          <h2 className="font-bold text-2xl" style={{textTransform: "capitalize"}}>
             {location.includes("profile") ? (
               <UserPlaceholder setUserData={setUserData} userData={userData} />
             ) : location.includes("explore") ? (
