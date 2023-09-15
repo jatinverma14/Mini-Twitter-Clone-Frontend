@@ -23,6 +23,7 @@ const Signin = () => {
       navigate("/");
     } catch (err) {
       alert("Wrong credentials or User doesn't exist");
+      console.log(err);
       dispatch(loginFailed());
     }
   };
