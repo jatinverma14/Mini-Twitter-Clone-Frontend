@@ -18,8 +18,8 @@ const LeftSidebar = () => {
   };
 
   return (
-    <div className="flex flex-col h-full md:h-[88vh] justify-between mr-6">
-      <div className="mt-6 flex flex-col space-y-4">
+    <div className="fixed flex flex-col h-full md:h-[88vh] justify-between mr-6">
+      <div className="mt-0 flex flex-col space-y-4">
         <Link to="/">
           <div className="flex items-center space-x-6 px-2 py-2 hover:bg-slate-200 rounded-full cursor-pointer">
             <HomeIcon fontSize="large" />
@@ -39,15 +39,15 @@ const LeftSidebar = () => {
           </div>
         </Link>
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <div>
-          <p className="font-bold" style={{textTransform: "capitalize"}}>{currentUser.username}</p>
+          <p className="font-bold capitalize">{currentUser.username}</p>
           <p className="font-bold">@{currentUser.username}</p>
         </div>
         <div>
           <Link to="signin">
             <button
-              className="bg-red-500 px-4 py-2 text-white rounded-full"
+              className="bg-red-500 px-4 py-2 text-white rounded-full ml-12"
               onClick={handleLogout}
             >
               Logout

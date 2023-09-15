@@ -1,10 +1,19 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import formatDistance from "date-fns/formatDistance";
 
-import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+
+import app from "../../firebase";
+import { changeProfile } from "../../redux/userSlice";
 
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -24,9 +33,9 @@ const Tweet = ({ tweet, setData }) => {
   const location = useLocation().pathname;
   const { id } = useParams();
 
-  const [editTweet, setEditTweet] = useState("");
+  const [editTweet, setEditTweet] = useState(tweet.description);
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -97,6 +106,52 @@ const Tweet = ({ tweet, setData }) => {
     }
   };
 
+  const [editImg, setEditImg] = useState(tweet.tweetImage);
+  const [img, setImg] = useState(null);
+  const [imgUploadProgress, setImgUploadProgress] = useState(0);
+
+  const dispatch = useDispatch();
+
+  const uploadImg = (file) => {
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + file.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    // Listen for state changes, errors, and completion of the upload.
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImgUploadProgress(Math.round(progress));
+        switch (snapshot.state) {
+          case "paused":
+            console.log("Upload is paused");
+            break;
+          case "running":
+            console.log("Upload is running");
+            break;
+          default:
+            break;
+        }
+      },
+      (error) => {},
+      () => {
+        // Upload completed successfully, now we can get the download URL
+        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+          try {
+            setEditImg(downloadURL);
+          } catch (error) {
+            console.log(error);
+          }
+          dispatch(changeProfile(downloadURL));
+        });
+      }
+    );
+  };
+
   const handleEdit = async (e) => {
     e.preventDefault();
     try {
@@ -104,14 +159,20 @@ const Tweet = ({ tweet, setData }) => {
         id: currentUser._id,
         isEdited: true,
         description: editTweet,
+        tweetImage: editImg,
       });
 
       showTweets();
       handleClose();
+      setImgUploadProgress(0);
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    img && uploadImg(img);
+  }, [img]);
 
   return (
     <div>
@@ -119,7 +180,9 @@ const Tweet = ({ tweet, setData }) => {
         <>
           <div className="flex space-x-2">
             <Link to={`/profile/${userData._id}`}>
-              <h3 className="font-bold" style={{textTransform: "capitalize"}}>{userData.username}</h3>
+              <h3 className="font-bold" style={{ textTransform: "capitalize" }}>
+                {userData.username}
+              </h3>
             </Link>
 
             <span className="font-normal">@{userData.username}</span>
@@ -129,6 +192,16 @@ const Tweet = ({ tweet, setData }) => {
           {/* {console.log("tweet: ", tweet)} */}
 
           <p>{tweet.description}</p>
+          {tweet.tweetImage ? (
+            <img
+              src={tweet.tweetImage}
+              alt="Tweet Image"
+              style={{ width: 200 }}
+            />
+          ) : null}
+          {tweet.isEdited ? (
+            <div className="text-xs text-red-600">(Edited)</div>
+          ) : null}
           <button onClick={handleLike}>
             {tweet.likes.includes(currentUser._id) ? (
               <FavoriteIcon className="mr-2 my-2 cursor-pointer"></FavoriteIcon>
@@ -172,6 +245,20 @@ const Tweet = ({ tweet, setData }) => {
                         >
                           {tweet.description}
                         </textarea>
+                        {tweet.tweetImage ? (
+                          <img src={tweet.tweetImage} alt="Tweet image" />
+                        ) : null}
+                        {imgUploadProgress > 0 ? (
+                          "Uploading " + imgUploadProgress + "%"
+                        ) : (
+                          <input
+                            type="file"
+                            className="bg-transparent border border-slate-500 rounded p-2"
+                            accept="image/*"
+                            onChange={(e) => setImg(e.target.files[0])}
+                            style={{ width: 150, marginRight: 8 }}
+                          />
+                        )}
                         <button
                           onClick={handleEdit}
                           className="bg-blue-500 text-white py-2 px-4 rounded-full ml-auto"
