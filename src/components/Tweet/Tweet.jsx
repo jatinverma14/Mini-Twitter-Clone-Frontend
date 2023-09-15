@@ -68,13 +68,25 @@ const Tweet = ({ tweet, setData }) => {
   const showTweets = async () => {
     if (location.includes("profile")) {
       const newData = await axios.get(`/tweets/user/all/${id}`);
-      setData(newData.data);
+      setData(
+        newData.data.sort((p1, p2) => {
+          return new Date(p2.createdAt) - new Date(p1.createdAt);
+        })
+      );
     } else if (location.includes("explore")) {
       const newData = await axios.get(`/tweets/explore`);
-      setData(newData.data);
+      setData(
+        newData.data.sort((p1, p2) => {
+          return new Date(p2.createdAt) - new Date(p1.createdAt);
+        })
+      );
     } else {
       const newData = await axios.get(`/tweets/timeline/${currentUser._id}`);
-      setData(newData.data);
+      setData(
+        newData.data.sort((p1, p2) => {
+          return new Date(p2.createdAt) - new Date(p1.createdAt);
+        })
+      );
     }
   };
 

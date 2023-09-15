@@ -25,7 +25,12 @@ const Profile = () => {
         const userTweets = await axios.get(`/tweets/user/all/${id}`);
         const userProfile = await axios.get(`/users/find/${id}`);
 
-        setUserTweets(userTweets.data);
+        // setUserTweets(userTweets.data);
+        setUserTweets(
+          userTweets.data.sort((p1, p2) => {
+            return new Date(p2.createdAt) - new Date(p1.createdAt);
+          })
+        );
         setUserProfile(userProfile.data);
       } catch (err) {
         console.log("error", err);
